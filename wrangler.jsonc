@@ -1,0 +1,79 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "ai-debug-agent",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-09-18",
+  "compatibility_flags": ["nodejs_compat"],
+
+  // The React SPA is built to dist/client and served by this same Worker.
+  // One deploy, one origin, no CORS, no separate Pages project.
+  // `not_found_handling: single-page-application` makes every unmatched path
+  // return index.html — which would swallow the API too, so /api/* is routed to
+  // the Worker first.
+  "assets": {
+    "directory": "./dist/client",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  },
+
+  "observability": {
+    "enabled": true
+  },
+
+  // Workers AI — 10,000 Neurons/day are included on the Free plan.
+  "ai": {
+    "binding": "AI"
+  },
+
+  // Durable Object = per-session agent memory. SQLite-backed classes are the
+  // ones available on the Free plan, hence "new_sqlite_classes" below.
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "DEBUG_SESSION",
+        "class_name": "DebugSession"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["DebugSession"]
+    }
+  ],
+
+  // Workflows = durable multi-step orchestration with a human approval gate.
+  "workflows": [
+    {
+      "name": "debug-workflow",
+      "binding": "DEBUG_WORKFLOW",
+      "class_name": "DebugWorkflow"
+    }
+  ],
+
+  // D1 = cross-session history + the daily Neuron ledger.
+  // Create with `wrangler d1 create ai-debug-agent-db`, then paste the id below.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "ai-debug-agent-db",
+      "database_id": "7825eead-9a0c-49c6-9679-08b169baac76"
+    }
+  ],
+
+  "vars": {
+    // Tool-calling model. Both defaults below are usable on the Free plan.
+    // "reasoning" is used for tool-calling / patch synthesis,
+    // "cheap" for classification and summarisation.
+    "MODEL_REASONING": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "MODEL_CHEAP": "@cf/meta/llama-3.1-8b-instruct-fp8",
+
+    // Free plan gives 10,000 Neurons/day. We stop at 9,000 to leave headroom
+    // so a demo never hard-fails mid-request.
+    "DAILY_NEURON_BUDGET": "9000",
+
+    // Max tool-calling iterations per chat turn (each iteration costs Neurons).
+    "MAX_TOOL_ITERATIONS": "4"
+  }
+}

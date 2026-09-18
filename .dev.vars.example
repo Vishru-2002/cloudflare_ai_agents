@@ -1,0 +1,17 @@
+# Local development only. Copy to `.dev.vars` and fill in.
+#
+# Workers AI's `AI` binding needs Wrangler to open a remote proxy session, which
+# requires a registered workers.dev subdomain. If your account doesn't have one,
+# set these two instead and the app calls the Workers AI REST API directly, so
+# `npm run dev` works locally.
+#
+# Leave both unset in production — the binding is used there.
+#
+# Account ID: dash.cloudflare.com -> Workers & Pages -> right sidebar
+# API token:  dash.cloudflare.com/profile/api-tokens -> Create Token
+#             -> Custom token -> Permissions: Account / Workers AI / Read
+#
+# .dev.vars is gitignored. Never commit a real token.
+
+CF_ACCOUNT_ID=your-account-id
+CF_AI_TOKEN=your-workers-ai-token

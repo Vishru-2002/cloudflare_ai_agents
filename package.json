@@ -1,0 +1,34 @@
+{
+  "name": "cloudflare-ai-debug-agent",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "An AI debugging agent built entirely on the Cloudflare free plan: Workers + Workers AI + Workflows + Durable Objects + D1, with a React frontend.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "deploy": "npm run build && wrangler deploy",
+    "typecheck": "tsc -b",
+    "cf-typegen": "wrangler types",
+    "db:init": "wrangler d1 execute ai-debug-agent-db --local --file=./schema.sql",
+    "db:init:remote": "wrangler d1 execute ai-debug-agent-db --remote --file=./schema.sql",
+    "tail": "wrangler tail"
+  },
+  "dependencies": {
+    "hono": "^4.6.14",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.0.0",
+    "@cloudflare/workers-types": "^5.20260918.1",
+    "@types/node": "^22.20.3",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7",
+    "wrangler": "^4.0.0"
+  }
+}
